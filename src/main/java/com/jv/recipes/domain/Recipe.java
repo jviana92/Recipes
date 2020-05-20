@@ -1,6 +1,7 @@
 package com.jv.recipes.domain;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -12,13 +13,16 @@ public class Recipe {
 
     private String description;
     private Integer prepTime;
-    private Integer cockTime;
+    private Integer cookTime;
     private Integer servings;
     private String source;
     private String url;
+    @Lob
     private String directions;
-    //todo add
-    //private Dificulty difficulty
+
+    private Difficulty difficulty;
+
+
 
     @Lob
     private Byte[] image;
@@ -26,10 +30,30 @@ public class Recipe {
     @OneToOne(cascade= CascadeType.ALL)
     private Notes notes;
 
-    @OneToMany(mappedBy = "recipe")
-    private Set<Ingredient> ingredient;
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "recipe")
+    private Set<Ingredient> ingredients = new HashSet<>();;
 
+    @Enumerated(value = EnumType.STRING)
+    public Difficulty getDifficulty() {
+        return difficulty;
+    }
 
+    @ManyToMany
+    @JoinTable(name = "recipe_category",
+        joinColumns = @JoinColumn(name = "recipe_id"),inverseJoinColumns = @JoinColumn(name="category_id"))
+    private Set<Category> categories = new HashSet<>();
+
+    public Set<Category> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(Set<Category> categories) {
+        this.categories = categories;
+    }
+
+    public void setDifficulty(Difficulty difficulty) {
+        this.difficulty = difficulty;
+    }
     public Long getId() {
         return id;
     }
@@ -54,12 +78,12 @@ public class Recipe {
         this.prepTime = prepTime;
     }
 
-    public Integer getCockTime() {
-        return cockTime;
+    public Integer getCookTime() {
+        return cookTime;
     }
 
-    public void setCockTime(Integer cockTime) {
-        this.cockTime = cockTime;
+    public void setCookTime(Integer cookTime) {
+        this.cookTime = cookTime;
     }
 
     public Integer getServings() {
@@ -108,13 +132,19 @@ public class Recipe {
 
     public void setNotes(Notes notes) {
         this.notes = notes;
+        notes.setRecipe(this);
     }
 
-    public Set<Ingredient> getIngredient() {
-        return ingredient;
+    public Set<Ingredient> getIngredients() {
+        return ingredients;
     }
 
-    public void setIngredient(Set<Ingredient> ingredient) {
-        this.ingredient = ingredient;
+    public Recipe addIngredient(Ingredient ingredient){
+        ingredient.setRecipe(this);
+        this.ingredients.add(ingredient);
+        return this;
+    }
+    public void setIngredients(Set<Ingredient> ingredient) {
+        this.ingredients = ingredients;
     }
 }
