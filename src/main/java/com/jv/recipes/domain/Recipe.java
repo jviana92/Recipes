@@ -4,6 +4,8 @@ import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
+import static javax.persistence.FetchType.EAGER;
+
 @Entity
 public class Recipe {
 
@@ -38,7 +40,7 @@ public class Recipe {
         return difficulty;
     }
 
-    @ManyToMany
+    @ManyToMany(fetch=EAGER)
     @JoinTable(name = "recipe_category",
         joinColumns = @JoinColumn(name = "recipe_id"),inverseJoinColumns = @JoinColumn(name="category_id"))
     private Set<Category> categories = new HashSet<>();
